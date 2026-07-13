@@ -240,47 +240,43 @@ function FavoritesModal({ isOpen, onClose }) {
           <button type="button" aria-label="Close favorites" onClick={onClose}>×</button>
         </div>
         <div className="favorite-modal-body">
-          <div className="favorites-grid">
-            <section className="favorite-category">
-              <h3>Games</h3>
-              <ul>
-                <li>Mobile Legends</li>
-                <li>Roblox</li>
-                <li>Growtopia</li>
-                <li>Chess</li>
-              </ul>
-            </section>
+          <div className="favorite-webpage">
+            <h3 className="favorite-page-title">Ibra's Favorite Web Page</h3>
 
-            <section className="favorite-category">
-              <h3>TV Shows</h3>
-              <ul>
-                <li>Breaking Bad</li>
-                <li>Euphoria</li>
-                <li>Reply 1988</li>
-              </ul>
-            </section>
+            <div className="favorites-collage">
+              <span className="favorite-doodle doodle-game" aria-hidden="true">🎮</span>
+              <span className="favorite-doodle doodle-tv" aria-hidden="true">📺</span>
+              <span className="favorite-doodle doodle-music" aria-hidden="true">💿</span>
+              <span className="favorite-doodle doodle-star" aria-hidden="true">★</span>
+              <span className="favorite-doodle doodle-chess" aria-hidden="true">♟</span>
+              <span className="favorite-doodle doodle-book" aria-hidden="true">📖</span>
 
-            <section className="favorite-category">
-              <h3>Music</h3>
-              <ul>
-                <li>Tame Impala</li>
-                <li>Mac DeMarco</li>
-                <li>Drake</li>
-                <li>Lana Del Rey</li>
-                <li>Payung Teduh</li>
-              </ul>
-            </section>
+              <section className="favorite-sticker favorite-games">
+                <h4>Games</h4>
+                <p>Mobile Legends · Roblox<br />Growtopia · Chess</p>
+              </section>
 
-            <section className="favorite-category favorite-website">
-              <h3>Favorite Website</h3>
-              <a href="https://quran.com" target="_blank" rel="noreferrer">Quran.com</a>
-            </section>
+              <section className="favorite-sticker favorite-shows">
+                <h4>TV Shows</h4>
+                <p>Breaking Bad · Euphoria<br />Reply 1988</p>
+              </section>
+
+              <figure className="favorite-photo-card">
+                <img src="/assets/my-fav-pic.png" alt="A Roblox character standing in grass with a Grass Touch prompt" />
+                <figcaption>My Favorite Pic</figcaption>
+              </figure>
+
+              <section className="favorite-sticker favorite-music">
+                <h4>Music</h4>
+                <p>Tame Impala · Mac DeMarco · Drake<br />Lana Del Rey · Payung Teduh</p>
+              </section>
+
+              <section className="favorite-sticker favorite-website">
+                <h4>Favorite Website</h4>
+                <a href="https://quran.com" target="_blank" rel="noreferrer">Quran.com</a>
+              </section>
+            </div>
           </div>
-
-          <section className="favorite-picture">
-            <h3>Favorite Pic</h3>
-            <img src="/assets/my-fav-pic.png" alt="A Roblox character standing in grass with a Grass Touch prompt" />
-          </section>
         </div>
       </section>
     </div>

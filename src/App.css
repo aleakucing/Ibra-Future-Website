@@ -500,7 +500,7 @@ h1 {
 }
 
 .favorite-modal {
-  width: min(100%, 640px);
+  width: min(100%, 780px);
   color: #000;
   background: #c0c0c0;
   border: 3px outset #eeeeee;
@@ -539,58 +539,132 @@ h1 {
 }
 
 .favorite-modal-body {
-  padding: 10px;
+  padding: 0;
   max-height: 78vh;
   overflow-y: auto;
 }
 
-.favorites-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.favorite-webpage {
+  min-height: 590px;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.17) 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 75%, rgba(0, 0, 0, 0.08) 0 2px, transparent 3px),
+    #78cfdf;
+  background-size: 31px 29px, 37px 41px, auto;
+  border: 3px inset #d8ffff;
 }
 
-.favorite-category,
-.favorite-picture {
-  padding: 8px;
-  background: #fff;
-  border: 2px inset #eeeeee;
+.favorite-page-title {
+  margin: 12px 12px 0;
+  color: #151018;
+  font-family: Rockwell, "Courier New", serif;
+  font-size: clamp(30px, 6vw, 50px);
+  font-weight: 900;
+  letter-spacing: 1px;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 3px 3px 0 #806f8c, 5px 5px 0 rgba(0, 0, 0, 0.22);
 }
 
-.favorite-category h3,
-.favorite-picture h3 {
-  margin: 0 0 7px;
-  padding: 3px 6px;
-  color: #fff;
-  background: #000080;
-  font-size: 13px;
+.favorites-collage {
+  height: 520px;
+  position: relative;
 }
 
-.favorite-category ul {
-  margin: 0 0 0 20px;
-  padding: 0;
+.favorite-sticker {
+  padding: 8px 11px;
+  position: absolute;
+  z-index: 2;
+  color: #111;
+  background: rgba(255, 250, 190, 0.93);
+  border: 3px outset #fff7a8;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
+  transform: rotate(-2deg);
+  text-align: center;
+}
+
+.favorite-sticker h4 {
+  margin: 0 0 5px;
+  color: #8b0065;
+  font: 900 18px/1 "Comic Sans MS", cursive;
+  text-decoration: underline;
+}
+
+.favorite-sticker p,
+.favorite-sticker a {
+  margin: 0;
   color: #000066;
-  font: 15px/1.45 "Times New Roman", Times, serif;
-  list-style-type: square;
+  font: 700 14px/1.35 "Comic Sans MS", cursive;
 }
 
-.favorite-website a {
-  display: inline-block;
-  margin: 4px 5px 7px;
-  font-family: "Times New Roman", Times, serif;
-  font-size: 16px;
+.favorite-games {
+  width: 235px;
+  left: 24px;
+  top: 74px;
 }
 
-.favorite-picture {
-  margin-top: 10px;
+.favorite-shows {
+  width: 220px;
+  right: 25px;
+  top: 91px;
+  transform: rotate(2deg);
 }
 
-.favorite-picture img {
+.favorite-music {
+  width: 290px;
+  left: 18px;
+  bottom: 35px;
+  transform: rotate(1deg);
+}
+
+.favorite-website {
+  width: 190px;
+  right: 24px;
+  bottom: 58px;
+  transform: rotate(-3deg);
+}
+
+.favorite-photo-card {
+  width: 230px;
+  margin: 0;
+  padding: 7px 7px 25px;
+  position: absolute;
+  left: 50%;
+  top: 172px;
+  z-index: 3;
+  transform: translateX(-50%) rotate(-1deg);
+  background: #f6f3e9;
+  border: 1px solid #b4b0a4;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.3);
+}
+
+.favorite-photo-card img {
   width: 100%;
-  max-height: 52vh;
   display: block;
-  object-fit: contain;
 }
+
+.favorite-photo-card figcaption {
+  margin-top: 6px;
+  color: #111;
+  font: 700 15px/1 "Comic Sans MS", cursive;
+  text-align: center;
+}
+
+.favorite-doodle {
+  position: absolute;
+  z-index: 1;
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+  font-size: 42px;
+}
+
+.doodle-game { left: 36px; top: 190px; transform: rotate(-14deg); }
+.doodle-tv { right: 38px; top: 205px; transform: rotate(11deg); }
+.doodle-music { left: 315px; top: 63px; transform: rotate(-9deg); }
+.doodle-star { right: 286px; bottom: 17px; color: #ffed00; transform: rotate(12deg); }
+.doodle-chess { left: 329px; bottom: 50px; color: #30243b; }
+.doodle-book { right: 305px; top: 111px; transform: rotate(8deg); }
 
 .site-footer {
   font-size: 14px;
@@ -662,8 +736,31 @@ h1 {
     align-items: center;
   }
 
-  .favorites-grid {
+  .favorite-webpage {
+    min-height: 0;
+  }
+
+  .favorites-collage {
+    height: auto;
+    display: grid;
     grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .favorite-sticker,
+  .favorite-photo-card {
+    width: 100%;
+    position: static;
+    transform: none;
+  }
+
+  .favorite-photo-card {
+    order: -1;
+  }
+
+  .favorite-doodle {
+    display: none;
   }
 
   .web-button {
