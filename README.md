@@ -1,13 +1,29 @@
-# Ibra's Home Page — React
+# Ibra's Home Page — React + Supabase
 
-Homepage pribadi bergaya World Wide Web retro yang dibuat dengan React dan Vite.
+Homepage pribadi bergaya World Wide Web retro yang dibuat dengan React, Vite,
+dan Supabase.
 
 ## Menjalankan proyek
 
 ```bash
 npm install
+copy .env.example .env.local
 npm run dev
 ```
+
+## Menghubungkan Supabase
+
+1. Buat project gratis di Supabase.
+2. Buka **SQL Editor** dan jalankan seluruh isi `supabase/schema.sql`.
+3. Buka **Project Settings → API**.
+4. Salin Project URL dan public/anon key ke `.env.local`:
+
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-public-anon-key
+```
+
+Jangan pernah memasukkan `service_role` key ke `.env.local` atau source React.
 
 ## Production build
 
@@ -16,5 +32,7 @@ npm run build
 npm run preview
 ```
 
-Messenger tidak membutuhkan login. Pesan tampil di bagian **What's New?** dan
-disimpan lokal di browser yang sama.
+Jika variabel Supabase belum tersedia, messenger dan visitor counter otomatis
+berjalan dalam mode lokal. Setelah dikonfigurasi, pesan disimpan global, feed
+akan menerima pesan baru secara realtime, dan visitor counter memakai fungsi
+SQL atomik.

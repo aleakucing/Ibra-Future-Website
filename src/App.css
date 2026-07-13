@@ -141,6 +141,24 @@ h1 {
   padding-right: 3px;
 }
 
+.feed-status {
+  margin: 0 0 7px !important;
+  font: 700 10px Arial, Helvetica, sans-serif !important;
+}
+
+.feed-status.global {
+  color: #087b23;
+}
+
+.feed-status.connecting,
+.feed-status.local {
+  color: #6f6200;
+}
+
+.feed-status.error {
+  color: #a00000;
+}
+
 .news-message {
   margin: 0 0 8px;
   padding: 6px 7px;
@@ -228,6 +246,20 @@ h1 {
   color: #168b2a;
   font-size: 9px;
   font-weight: 700;
+}
+
+.online-dot.local {
+  color: #9a7200;
+}
+
+.chat-status {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chat-status.error {
+  color: #b00000;
 }
 
 .chat-close {
@@ -341,6 +373,11 @@ h1 {
 
 .send-button:active {
   border-style: inset;
+}
+
+.send-button:disabled {
+  color: #777;
+  cursor: wait;
 }
 
 @keyframes blink {

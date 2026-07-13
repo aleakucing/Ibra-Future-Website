@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { isSupabaseConfigured, supabase } from "./lib/supabase.js";
 
-const STORAGE_KEY = "ibra-homepage-messages";
+const MESSAGE_STORAGE_KEY = "ibra-homepage-messages";
+const VISITOR_STORAGE_KEY = "ibra-homepage-visitor-count";
+const VISITOR_SESSION_KEY = "ibra-homepage-visitor-counted";
 const MAX_MESSAGES = 20;
 
 const siteUpdates = [
@@ -8,13 +11,28 @@ const siteUpdates = [
   { id: "online", meta: "06/30/01 · Ibra", text: "Welcome page is finally online." },
 ];
 
-function readMessages() {
+function readLocalMessages() {
   try {
-    const saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "[]");
+    const saved = JSON.parse(window.localStorage.getItem(MESSAGE_STORAGE_KEY) || "[]");
     return Array.isArray(saved) ? saved.slice(-MAX_MESSAGES) : [];
   } catch {
     return [];
   }
+}
+
+function mapMessage(row) {
+  return {
+    id: row.id,
+    from: row.from_name,
+    to: row.to_name,
+    text: row.body,
+    timestamp: row.created_at,
+  };
+}
+
+function appendUnique(messages, message) {
+  if (messages.some((item) => item.id === message.id)) return messages;
+  return [...messages, message].slice(-MAX_MESSAGES);
 }
 
 function formatTime(timestamp) {
@@ -36,9 +54,17 @@ function RetroPanel({ className = "", title, children, id }) {
   );
 }
 
-function WhatsNew({ messages }) {
+function WhatsNew({ messages, backendStatus }) {
+  const statusText = {
+    connecting: "Connecting to global message board...",
+    global: "Global message board online",
+    local: "Local mode — add Supabase keys to go global",
+    error: "Supabase unavailable — using saved local messages",
+  }[backendStatus];
+
   return (
     <RetroPanel className="news-panel" title="What's New?">
+      <p className={`feed-status ${backendStatus}`}>● {statusText}</p>
       <div className="news-feed" aria-live="polite">
         {[...messages].reverse().map((message, index) => (
           <article
@@ -64,27 +90,39 @@ function WhatsNew({ messages }) {
   );
 }
 
-function Messenger({ isOpen, onClose, onSend, fromRef, chatRef }) {
+function Messenger({ isOpen, onClose, onSend, fromRef, chatRef, backendStatus }) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("Ibra");
   const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const messageRef = useRef(null);
 
-  const submitMessage = (event) => {
+  const submitMessage = async (event) => {
     event.preventDefault();
     const cleanMessage = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       from: from.trim(),
       to: to.trim(),
       text: message.trim(),
-      timestamp: Date.now(),
+      timestamp: new Date().toISOString(),
     };
 
     if (!cleanMessage.from || !cleanMessage.to || !cleanMessage.text) return;
 
-    onSend(cleanMessage);
-    setMessage("");
-    messageRef.current?.focus();
+    setIsSending(true);
+    setSendError("");
+
+    try {
+      await onSend(cleanMessage);
+      setMessage("");
+      messageRef.current?.focus();
+    } catch (error) {
+      console.error(error);
+      setSendError("Message could not be sent. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const addText = (addition) => {
@@ -103,12 +141,16 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef }) {
 
   if (!isOpen) return null;
 
+  const isGlobal = backendStatus === "global";
+
   return (
     <section className="chat-box" id="chat" aria-labelledby="chat-title" ref={chatRef}>
       <div className="chat-titlebar">
         <span aria-hidden="true">✉</span>
         <h2 id="chat-title">Ibra's Instant Messenger</h2>
-        <span className="online-dot">● ONLINE</span>
+        <span className={`online-dot ${isGlobal ? "global" : "local"}`}>
+          ● {isGlobal ? "GLOBAL" : "LOCAL"}
+        </span>
         <button className="chat-close" type="button" aria-label="Close messenger" onClick={onClose}>×</button>
       </div>
 
@@ -147,14 +189,18 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef }) {
           required
         />
 
+        {sendError && <p className="chat-status error" role="alert">{sendError}</p>}
+
         <div className="chat-toolbar">
           <div className="chat-tools" aria-label="Message tools">
             <button type="button" className="tiny-tool text-tool" title="Plain text">T</button>
             <button type="button" className="tiny-tool" title="Add smiley" onClick={() => addText(" :)")}>🙂</button>
             <button type="button" className="tiny-tool" title="Add sleepy text" onClick={() => addText(" Zzz")}>Z</button>
           </div>
-          <span className="no-login">No login required</span>
-          <button className="send-button" type="submit">Send</button>
+          <span className="no-login">{isGlobal ? "Saved globally" : "Saved locally"}</span>
+          <button className="send-button" type="submit" disabled={isSending}>
+            {isSending ? "Sending..." : "Send"}
+          </button>
         </div>
       </form>
     </section>
@@ -162,7 +208,11 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef }) {
 }
 
 function App() {
-  const [messages, setMessages] = useState(readMessages);
+  const [messages, setMessages] = useState(readLocalMessages);
+  const [backendStatus, setBackendStatus] = useState(
+    isSupabaseConfigured ? "connecting" : "local",
+  );
+  const [visitorCount, setVisitorCount] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const launcherRef = useRef(null);
   const fromRef = useRef(null);
@@ -170,11 +220,90 @@ function App() {
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      window.localStorage.setItem(MESSAGE_STORAGE_KEY, JSON.stringify(messages));
     } catch {
       // Messages remain available for the current session when storage is blocked.
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return undefined;
+    let isActive = true;
+
+    const loadMessages = async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("id, from_name, to_name, body, created_at")
+        .order("created_at", { ascending: false })
+        .limit(MAX_MESSAGES);
+
+      if (!isActive) return;
+
+      if (error) {
+        console.error(error);
+        setBackendStatus("error");
+        return;
+      }
+
+      setMessages(data.reverse().map(mapMessage));
+      setBackendStatus("global");
+    };
+
+    loadMessages();
+
+    const channel = supabase
+      .channel("ibra-public-messages")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        (payload) => {
+          setMessages((current) => appendUnique(current, mapMessage(payload.new)));
+        },
+      )
+      .subscribe();
+
+    return () => {
+      isActive = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadVisitorCount = async () => {
+      if (!isSupabaseConfigured) {
+        const previous = Number(window.localStorage.getItem(VISITOR_STORAGE_KEY)) || 314;
+        const counted = window.sessionStorage.getItem(VISITOR_SESSION_KEY);
+        const next = counted ? previous : previous + 1;
+
+        if (!counted) {
+          window.localStorage.setItem(VISITOR_STORAGE_KEY, String(next));
+          window.sessionStorage.setItem(VISITOR_SESSION_KEY, "yes");
+        }
+
+        setVisitorCount(next);
+        return;
+      }
+
+      const counted = window.sessionStorage.getItem(VISITOR_SESSION_KEY);
+      const functionName = counted ? "get_visitor_count" : "increment_visitor";
+
+      if (!counted) window.sessionStorage.setItem(VISITOR_SESSION_KEY, "pending");
+
+      const { data, error } = await supabase.rpc(functionName, { p_page_key: "home" });
+
+      if (error) {
+        console.error(error);
+        if (!counted) window.sessionStorage.removeItem(VISITOR_SESSION_KEY);
+        setVisitorCount(314);
+        return;
+      }
+
+      window.sessionStorage.setItem(VISITOR_SESSION_KEY, "yes");
+      setVisitorCount(Number(data));
+    };
+
+    loadVisitorCount();
+  }, []);
 
   useEffect(() => {
     if (!isChatOpen) return;
@@ -195,9 +324,27 @@ function App() {
     window.requestAnimationFrame(() => launcherRef.current?.focus());
   };
 
-  const sendMessage = (message) => {
-    setMessages((current) => [...current, message].slice(-MAX_MESSAGES));
+  const sendMessage = async (message) => {
+    if (!isSupabaseConfigured || backendStatus === "error") {
+      setMessages((current) => appendUnique(current, message));
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        from_name: message.from,
+        to_name: message.to,
+        body: message.text,
+      })
+      .select("id, from_name, to_name, body, created_at")
+      .single();
+
+    if (error) throw error;
+    setMessages((current) => appendUnique(current, mapMessage(data)));
   };
+
+  const visitorDigits = String(visitorCount ?? 0).padStart(6, "0").slice(-6);
 
   return (
     <main className="homepage">
@@ -235,7 +382,7 @@ function App() {
             <li><a href="#chat" onClick={openChat}>Instant Message Me!</a></li>
           </ul>
         </RetroPanel>
-        <WhatsNew messages={messages} />
+        <WhatsNew messages={messages} backendStatus={backendStatus} />
       </div>
 
       <button
@@ -255,6 +402,7 @@ function App() {
         onSend={sendMessage}
         fromRef={fromRef}
         chatRef={chatRef}
+        backendStatus={backendStatus}
       />
 
       <section className="dog-zone" id="dog-zone">
@@ -267,7 +415,7 @@ function App() {
 
       <div className="under-construction">
         <span aria-hidden="true">🚧</span>
-        {' '}THIS PAGE IS ALWAYS UNDER CONSTRUCTION{' '}
+        {" "}THIS PAGE IS ALWAYS UNDER CONSTRUCTION{" "}
         <span aria-hidden="true">🚧</span>
       </div>
 
@@ -278,8 +426,10 @@ function App() {
 
       <footer className="site-footer">
         <p>You are visitor number:</p>
-        <p className="counter" aria-label="Visitor number 000314">
-          {"000314".split("").map((digit, index) => <span key={`${digit}-${index}`}>{digit}</span>)}
+        <p className="counter" aria-label={`Visitor number ${visitorDigits}`}>
+          {visitorDigits.split("").map((digit, index) => (
+            <span key={`${digit}-${index}`}>{digit}</span>
+          ))}
         </p>
         <p className="best-viewed">Best viewed in 800 × 600 with Netscape Navigator 4.0</p>
         <p className="modem">Optimized for a blazing fast 56k modem!</p>
