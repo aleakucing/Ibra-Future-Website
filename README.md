@@ -7,7 +7,6 @@ dan Supabase.
 
 ```bash
 npm install
-copy .env.example .env.local
 npm run dev
 ```
 
@@ -16,7 +15,7 @@ npm run dev
 1. Buat project gratis di Supabase.
 2. Buka **SQL Editor** dan jalankan seluruh isi `supabase/schema.sql`.
 3. Buka **Project Settings → API**.
-4. Salin Project URL dan public/anon key ke `.env.local`:
+4. Buat file `.env.local`, lalu masukkan Project URL dan public/anon key:
 
 ```env
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
