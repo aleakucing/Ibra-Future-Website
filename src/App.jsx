@@ -147,7 +147,7 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef, backendStatus })
     <section className="chat-box" id="chat" aria-labelledby="chat-title" ref={chatRef}>
       <div className="chat-titlebar">
         <span aria-hidden="true">✉</span>
-        <h2 id="chat-title">Ibra's Instant Messenger</h2>
+        <h2 id="chat-title">Ibra's Instant Messenger (click)ha</h2>
         <span className={`online-dot ${isGlobal ? "global" : "local"}`}>
           ● {isGlobal ? "GLOBAL" : "LOCAL"}
         </span>
@@ -207,6 +207,46 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef, backendStatus })
   );
 }
 
+function FavoritePicModal({ isOpen, onClose }) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="favorite-modal-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        className="favorite-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="favorite-modal-title"
+      >
+        <div className="favorite-modal-titlebar">
+          <h2 id="favorite-modal-title">My Fav Pic</h2>
+          <button type="button" aria-label="Close favorite picture" onClick={onClose}>×</button>
+        </div>
+        <div className="favorite-modal-body">
+          <img src="/assets/my-fav-pic.png" alt="A Roblox character standing in grass with a Grass Touch prompt" />
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function App() {
   const [messages, setMessages] = useState(readLocalMessages);
   const [backendStatus, setBackendStatus] = useState(
@@ -214,6 +254,7 @@ function App() {
   );
   const [visitorCount, setVisitorCount] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isFavoritePicOpen, setIsFavoritePicOpen] = useState(false);
   const launcherRef = useRef(null);
   const fromRef = useRef(null);
   const chatRef = useRef(null);
@@ -344,6 +385,11 @@ function App() {
     setMessages((current) => appendUnique(current, mapMessage(data)));
   };
 
+  const openFavoritePic = (event) => {
+    event?.preventDefault();
+    setIsFavoritePicOpen(true);
+  };
+
   const visitorDigits = String(visitorCount ?? 0).padStart(6, "0").slice(-6);
 
   return (
@@ -370,7 +416,7 @@ function App() {
           dogs, and exploring the Internet. This is my personal home page, made by
           hand with lots of HTML and zero fancy web builders!
         </p>
-        <p>Thanks for stopping by. Please sign my guestbook before you leave.</p>
+        <p>Thanks for stopping by. Check out my favorite picture before you leave.</p>
       </RetroPanel>
 
       <div className="columns">
@@ -378,8 +424,8 @@ function App() {
           <ul>
             <li><a href="#about">About Ibra</a></li>
             <li><a href="#dog-zone">My Dog Zone</a></li>
-            <li><a href="#guestbook">Sign My Guestbook</a></li>
             <li><a href="#chat" onClick={openChat}>Instant Message Me!</a></li>
+            <li><a href="#favorite-picture" onClick={openFavoritePic}>My Fav Pic</a></li>
           </ul>
         </RetroPanel>
         <WhatsNew messages={messages} backendStatus={backendStatus} />
@@ -419,9 +465,9 @@ function App() {
         <span aria-hidden="true">🚧</span>
       </div>
 
-      <section className="guestbook" id="guestbook">
-        <a className="web-button" href="#chat" onClick={openChat}>✎ Sign My Guestbook</a>
-        <a className="web-button" href="#guestbook">☞ View My Guestbook</a>
+      <section className="guestbook" id="favorite-picture">
+        <button className="web-button" type="button" onClick={openFavoritePic}>▣ My Fav Pic</button>
+        <a className="web-button" href="#links">★ My Favorite Links</a>
       </section>
 
       <footer className="site-footer">
@@ -435,6 +481,11 @@ function App() {
         <p className="modem">Optimized for a blazing fast 56k modem!</p>
         <p className="copyright">© 2026–2031 Ibra's Home Page · Made with Zed</p>
       </footer>
+
+      <FavoritePicModal
+        isOpen={isFavoritePicOpen}
+        onClose={() => setIsFavoritePicOpen(false)}
+      />
     </main>
   );
 }
