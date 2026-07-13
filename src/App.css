@@ -465,7 +465,7 @@ h1 {
   text-shadow: 1px 1px 0 #ffcc00, -1px -1px 0 #ffcc00;
 }
 
-.guestbook {
+.favorite-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
@@ -500,7 +500,7 @@ h1 {
 }
 
 .favorite-modal {
-  width: min(100%, 560px);
+  width: min(100%, 640px);
   color: #000;
   background: #c0c0c0;
   border: 3px outset #eeeeee;
@@ -540,14 +540,56 @@ h1 {
 
 .favorite-modal-body {
   padding: 10px;
+  max-height: 78vh;
+  overflow-y: auto;
 }
 
-.favorite-modal-body img {
+.favorites-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.favorite-category,
+.favorite-picture {
+  padding: 8px;
+  background: #fff;
+  border: 2px inset #eeeeee;
+}
+
+.favorite-category h3,
+.favorite-picture h3 {
+  margin: 0 0 7px;
+  padding: 3px 6px;
+  color: #fff;
+  background: #000080;
+  font-size: 13px;
+}
+
+.favorite-category ul {
+  margin: 0 0 0 20px;
+  padding: 0;
+  color: #000066;
+  font: 15px/1.45 "Times New Roman", Times, serif;
+  list-style-type: square;
+}
+
+.favorite-website a {
+  display: inline-block;
+  margin: 4px 5px 7px;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
+}
+
+.favorite-picture {
+  margin-top: 10px;
+}
+
+.favorite-picture img {
   width: 100%;
-  max-height: 70vh;
+  max-height: 52vh;
   display: block;
   object-fit: contain;
-  border: 2px inset #eeeeee;
 }
 
 .site-footer {
@@ -615,9 +657,13 @@ h1 {
     height: 110px;
   }
 
-  .guestbook {
+  .favorite-actions {
     flex-direction: column;
     align-items: center;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
   }
 
   .web-button {

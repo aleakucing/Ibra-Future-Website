@@ -207,7 +207,7 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef, backendStatus })
   );
 }
 
-function FavoritePicModal({ isOpen, onClose }) {
+function FavoritesModal({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -236,11 +236,51 @@ function FavoritePicModal({ isOpen, onClose }) {
         aria-labelledby="favorite-modal-title"
       >
         <div className="favorite-modal-titlebar">
-          <h2 id="favorite-modal-title">My Fav Pic</h2>
-          <button type="button" aria-label="Close favorite picture" onClick={onClose}>×</button>
+          <h2 id="favorite-modal-title">Ibra's Favorites</h2>
+          <button type="button" aria-label="Close favorites" onClick={onClose}>×</button>
         </div>
         <div className="favorite-modal-body">
-          <img src="/assets/my-fav-pic.png" alt="A Roblox character standing in grass with a Grass Touch prompt" />
+          <div className="favorites-grid">
+            <section className="favorite-category">
+              <h3>Games</h3>
+              <ul>
+                <li>Mobile Legends</li>
+                <li>Roblox</li>
+                <li>Growtopia</li>
+                <li>Chess</li>
+              </ul>
+            </section>
+
+            <section className="favorite-category">
+              <h3>TV Shows</h3>
+              <ul>
+                <li>Breaking Bad</li>
+                <li>Euphoria</li>
+                <li>Reply 1988</li>
+              </ul>
+            </section>
+
+            <section className="favorite-category">
+              <h3>Music</h3>
+              <ul>
+                <li>Tame Impala</li>
+                <li>Mac DeMarco</li>
+                <li>Drake</li>
+                <li>Lana Del Rey</li>
+                <li>Payung Teduh</li>
+              </ul>
+            </section>
+
+            <section className="favorite-category favorite-website">
+              <h3>Favorite Website</h3>
+              <a href="https://quran.com" target="_blank" rel="noreferrer">Quran.com</a>
+            </section>
+          </div>
+
+          <section className="favorite-picture">
+            <h3>Favorite Pic</h3>
+            <img src="/assets/my-fav-pic.png" alt="A Roblox character standing in grass with a Grass Touch prompt" />
+          </section>
         </div>
       </section>
     </div>
@@ -254,7 +294,7 @@ function App() {
   );
   const [visitorCount, setVisitorCount] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isFavoritePicOpen, setIsFavoritePicOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const launcherRef = useRef(null);
   const fromRef = useRef(null);
   const chatRef = useRef(null);
@@ -385,9 +425,9 @@ function App() {
     setMessages((current) => appendUnique(current, mapMessage(data)));
   };
 
-  const openFavoritePic = (event) => {
+  const openFavorites = (event) => {
     event?.preventDefault();
-    setIsFavoritePicOpen(true);
+    setIsFavoritesOpen(true);
   };
 
   const visitorDigits = String(visitorCount ?? 0).padStart(6, "0").slice(-6);
@@ -416,7 +456,7 @@ function App() {
           dogs, and exploring the Internet. This is my personal home page, made by
           hand with lots of HTML and zero fancy web builders!
         </p>
-        <p>Thanks for stopping by. Check out my favorite picture before you leave.</p>
+        <p>Thanks for stopping by. Check out my favorite things before you leave.</p>
       </RetroPanel>
 
       <div className="columns">
@@ -425,7 +465,7 @@ function App() {
             <li><a href="#about">About Ibra</a></li>
             <li><a href="#dog-zone">My Dog Zone</a></li>
             <li><a href="#chat" onClick={openChat}>Instant Message Me!</a></li>
-            <li><a href="#favorite-picture" onClick={openFavoritePic}>My Fav Pic</a></li>
+            <li><a href="#my-favorites" onClick={openFavorites}>My Favorite</a></li>
           </ul>
         </RetroPanel>
         <WhatsNew messages={messages} backendStatus={backendStatus} />
@@ -465,9 +505,9 @@ function App() {
         <span aria-hidden="true">🚧</span>
       </div>
 
-      <section className="guestbook" id="favorite-picture">
-        <button className="web-button" type="button" onClick={openFavoritePic}>▣ My Fav Pic</button>
-        <a className="web-button" href="#links">★ My Favorite Links</a>
+      <section className="favorite-actions" id="my-favorites">
+        <button className="web-button" type="button" onClick={openFavorites}>★ My Favorite</button>
+        <a className="web-button" href="#links">↑ Back to Cool Links</a>
       </section>
 
       <footer className="site-footer">
@@ -482,9 +522,9 @@ function App() {
         <p className="copyright">© 2026–2031 Ibra's Home Page · Made with Zed</p>
       </footer>
 
-      <FavoritePicModal
-        isOpen={isFavoritePicOpen}
-        onClose={() => setIsFavoritePicOpen(false)}
+      <FavoritesModal
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
       />
     </main>
   );
