@@ -7,8 +7,8 @@ const VISITOR_SESSION_KEY = "ibra-homepage-visitor-counted";
 const MAX_MESSAGES = 20;
 
 const siteUpdates = [
-  { id: "dogs", meta: "07/14/01 · Ibra", text: "I added two cool dachshunds!" },
-  { id: "online", meta: "06/30/01 · Ibra", text: "Welcome page is finally online." },
+  { id: "dogs", meta: "07/10/26 · Ibra", text: "I added two cool dachshunds!" },
+  { id: "online", meta: "06/10/26 · Ibra", text: "Welcome page is finally online." },
 ];
 
 function readLocalMessages() {
@@ -147,7 +147,7 @@ function Messenger({ isOpen, onClose, onSend, fromRef, chatRef, backendStatus })
     <section className="chat-box" id="chat" aria-labelledby="chat-title" ref={chatRef}>
       <div className="chat-titlebar">
         <span aria-hidden="true">✉</span>
-        <h2 id="chat-title">Ibra's Instant Messenger (click)ha</h2>
+        <h2 id="chat-title">Ibra's Instant Messenger</h2>
         <span className={`online-dot ${isGlobal ? "global" : "local"}`}>
           ● {isGlobal ? "GLOBAL" : "LOCAL"}
         </span>
@@ -475,7 +475,7 @@ function App() {
         aria-expanded={isChatOpen}
         onClick={() => (isChatOpen ? closeChat() : setIsChatOpen(true))}
       >
-        💬 Ibra's Instant Messenger
+        💬 Ibra's Instant Messenger (click)
       </button>
 
       <Messenger
