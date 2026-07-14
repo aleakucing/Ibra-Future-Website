@@ -24,6 +24,18 @@ VITE_SUPABASE_ANON_KEY=your-public-anon-key
 
 Jangan pernah memasukkan `service_role` key ke `.env.local` atau source React.
 
+## Visitor otomatis harian
+
+Workflow `.github/workflows/daily-visitor.yml` menambah visitor sebanyak satu
+setiap hari pada pukul 00.05 WIB. Tambahkan dua repository secret melalui
+**GitHub → Settings → Secrets and variables → Actions**:
+
+- `SUPABASE_URL`: Project URL Supabase, misalnya `https://project-id.supabase.co`
+- `SUPABASE_ANON_KEY`: public/anon key Supabase
+
+Workflow juga dapat diuji secara manual melalui tab **Actions → Daily visitor
+increment → Run workflow**. Setiap pengujian manual ikut menambah visitor satu.
+
 ## Production build
 
 ```bash
